@@ -2,23 +2,23 @@
 
 void USART2_Init(void){
 
- RCC->APB1ENR  |=  0x20000; 
+ RCC->APB1ENR  |=  0x20000; //enabling the power interface clock R/W
 
- RCC->AHB1ENR   |=0x01;
+ RCC->AHB1ENR   |=0x01; //enabling Timer
 
  
-GPIOA->MODER &=~0x00F0;
-GPIOA->MODER |= 0x00A0; 
+GPIOA->MODER &=~0x00F0; //clears mode settings for configuration
+GPIOA->MODER |= 0x00A0; //configure for alternate function
 
- GPIOA->AFR[0] &= ~0xFF00;
- GPIOA->AFR[0] |= 0x7700;
+ GPIOA->AFR[0] &= ~0xFF00; //clear GPIOA function
+ GPIOA->AFR[0] |= 0x7700; //set GPIOA function to 
 
 
 USART2->BRR  =  0x0683;
-USART2->CR1  =  0x000C; 
-USART2->CR2  =  0x000;
-USART2->CR3  =  0x000;
-USART2->CR1  |=  0x2000; 
+USART2->CR1  =  0x000C; //enable RE and TE
+USART2->CR2  =  0x000; //clearing CR2
+USART2->CR3  =  0x000; //clearing CR3
+USART2->CR1  |=  0x2000; //enable LIN-mode for CR1
 	
 	
 
@@ -26,15 +26,15 @@ USART2->CR1  |=  0x2000;
 
 int USART2_write(int ch){
 
-	while(!(USART2->SR & 0x0080)){}
-	USART2->DR = (ch & 0xFF);
+	while(!(USART2->SR & 0x0080)){} // while USART2 Serial register has not detected a LIN-break flag, continue
+	USART2->DR = (ch & 0xFF); // enabling reading and writing to the Data Registers 8bits, in this case writing
 	
-  return ch;
+  return ch; //returning the stored value from DR
 }
 
 int USART2_read(void){
-  while(!(USART2->SR & 0x0020)){}
-	return USART2->DR;
+  while(!(USART2->SR & 0x0020)){} // While transmission is NOT complete, continue
+	return USART2->DR; //returning bits from Data register
 }
 
 struct __FILE { int handle; };
